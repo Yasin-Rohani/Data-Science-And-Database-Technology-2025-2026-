@@ -15,37 +15,78 @@ GROUP BY ProvunceH , "2-month", PurchaseChannel , Year , RegionH
 
 1. BLOCK A 
 
-SELECT Minibar, Safe, Revenue, RegionH, "2-Months", CityH , Year , "3-MOnths" , ProvinceH , SUM(Revenue) as TotRev
-FROM ROOM-TYPE RT , TIME T , BOOKINGS B , HOTELS H
+SELECT Minibar, Safe,  CountryH, "2-Months", CityH , Year , "3-MOnths" , SUM(Revenue) as TotRev
+FROM ROOM_TYPE RT , TIME T , BOOKINGS B , HOTELS H
 WHERE RT.TimeID = T.TIMEID AND RT.RTID = B.RTID AND H.HotelID = B.HotelID
 GROUP BY Minibar, Safe, RegionH, "2-Months", CityH , Year , "3-MOnths" , ProvinceH
 
 2.Minimal set
-Minibar, Safe, "2-Months", CityH , "3-MOnths" 
+Minibar, Safe, "2-Months", CityH , "3-MOnths" , CountryH
 
 3. Trigger
-CREAT OR REPLACE TRIGGER TriggerViewBooking
-AFTER INSER ON BOOKINGS
-FOR EACH ROW 
+######################################ُ
+CREATE OR REPLACE TRIGGER TriggerBookingView
+AFTER INSERT ON BOOKINGS
+FOR EACH ROW
+DECLARE 
+varCityH VARCHAR(50)
+varRegionH VARCHAR(50)
+varCountryH VARCHAR(50)ُ
+varMinbar VARCHAR(10)
+varSafe VARCHAR(10)
+var2M VARCHAR(20)
+var3M VARCHAR(20)
+varYear INTEGER;
+N INTEGER;
 BEGIN
-UPDATE VEIWBOOKING V
-set
+######################################
 
-V.TotRev = V.TotRev + :NEW.Revenue
-WHERE V.CityH = (SELECT H.CityH FROM Hotel H WHERE H.HotelID = :NEW.HotelID)
-AND V.Minibar = (SELECT RT.Minibar FROM "ROOM-Type" RT WHERE RT.RTID = :NEW.RTID)
-AND V.Safe = (SELECT RT.Safe FROM "ROOM-Type" RT WHERE RT.RTID = :NEW.RTID)
-AND V.RegionH = (SELECT H.RegionH FROM Hotel H WHERE H.HotelID = :NEW.HotelID)
-AND V."2-Months" = (SELECT T."2-Months" FROM Time T WHERE TimeID = :NEW.TimeID)
-AND V."3-Months" = (SELECT T."3-Months" FROM Time T WHERE TimeID = :NEW.TimeID)
-AND V."Year" = (SELECT T."Year" FROM Time T WHERE TimeID = :NEW.TimeID)
-AND V.ProvinceH = (SELECT H.ProvinceH FROM Hotel H WHERE H.HotelID = :NEW.HotelID)
+SELECT CityH, CountryH , RegionH
+INTO varCityH, varRegionH, varCountryH
+FROM HOTEL
+WHERE HotelID = :NEW.HotelID;
 
-IF SQL%ROWCOUNT = 0 THEN
-INSERT INTO VeiwBookings
-SELECT RT.Minibar, RT.Safe, H.RegionH, T."2-Months", H.CityH , T.Year , T."3-MOnths" , H.ProvinceH , :NEW.Revenue
-FROM ROOM-TYPE RT , TIME T , HOTELS H
-WHERE H.HotelID =:NEW.HotelID AND RT.RTID = :NEW.RTID AND TimeID = :NEW.TimeID
+SELECT Minibar, Safe
+INTO varMinbar, varSafe
+FROM ROOM_TYPE
+WHERE RTID = :NEW.RTID;
+
+
+SELECT 2M , 3M , Year
+INTO var2M , var3M
+FROM TIME
+WHERE TimeID = :NEw.TimeID;
+
+SELECT Count(*)
+INTO N
+FROM ViewBooking
+WHERE varCityH = varCityH
+AND Minibar = varMinibar
+AND Safe = varSafe
+AND "2-Months" = var2M
+AND "3-Months" = var3M;
+
+######################################
+IF N > 0 THEN;
+
+UPDATE TotRev = TotRev + :NEW.Revenue;
+
+ELSE
+INSERT INTO ViewBooking(
+     CityH, RegionH, CountryH,
+    Minibar, Safe,
+    "2-Months", "3-Months", Year,
+    TotRevenue
+)
+
+VALUES
+(
+    varCityH, varRegionH, varCountryH,
+    varMinibar, varSafe,
+    var2M, var3M, varYear,
+    :NEW.Revenue
+);
+
 END IF;
 END;
 -----------------------------------------------------------------------------------------------------------------------------------
