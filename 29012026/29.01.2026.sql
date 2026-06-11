@@ -111,7 +111,7 @@ WHERE TimeID = :NEw.TimeID;
 SELECT Count(*)
 INTO N
 FROM ViewBooking
-WHERE varCityH = varCityH
+WHERE CityH = varCityH
 AND Minibar = varMinibar
 AND Safe = varSafe
 AND "2-Months" = var2M
@@ -157,7 +157,7 @@ END;
 -- the total revenue, computed separately by year and by the guest’s country of origin.
 -- Assign to each record a rank, computed separately for each year, based on total revenue
 
-SELECT CityG , "6-months" , 
+SELECT CityG , "6-months"
 
 SUM(Num_Guest)/SUM(Num_Booked_Rooms),
 100*SUM(Revenue)/SUM(SUM(Revenue))OVER(PARTITION BY CountryG, "6-Months"),
