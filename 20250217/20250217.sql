@@ -117,7 +117,7 @@ AND Region='Piedmont'
 GROUP BY Service, 6M, Service_Type, Year
 
 ########################################################################################################################################################
-
+#MaterialsView  (5 Points)
 -- TIME_HOUR (HourID, Hour, Time_Slot) 
 -- TIME_DATE (DateID, Date, Month, 2-Months, 3-Months, 6-Months, Year)
 -- USER_TYPE (UserTypeID, User_Type, User-Category)
