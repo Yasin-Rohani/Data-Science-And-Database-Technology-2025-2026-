@@ -20,12 +20,8 @@ Data-Science-And-Database-Technology-2025-2026/
 │   ├── 29.01.2026.sql
 │   └── Datascience_exam-2026-01-29...
 │
-├── 20260216/
-│   ├── 16.02.2026.sql
-│   └── Exam simulation 16-02-2026.pdf
-│
-└── README.md
-
+|
+...
 Contents
 
 The repository includes:
